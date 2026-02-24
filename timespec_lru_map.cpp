@@ -47,6 +47,17 @@ First map entry timestamp: 1771895933.908240100, key: 1
 fpotm@LAPTOP-EA8OT4CH MINGW64 /c/dev
 #endif
 
+void cleanup_stack_string( void* str )
+{
+    (void)(str); // error: unused parameter ‘str’ [-Werror=unused-parameter]
+    // do nothing for stack allocated strings.
+    // or anything allocated on the stack.
+    // could try to free it just to see what happens!
+
+    std::cout << __func__ << " called with arg: '"
+        << (char*)str << "' - doing nothing, stack string!" 
+        << std::endl;
+}
 
 void cleanup_allocated_string( void* str )
 {
@@ -104,10 +115,6 @@ int main(void)
 
 
     timespec_get(&ts, TIME_UTC);
-    lru_map.emplace(ts, 2);
-
-
-    timespec_get(&ts, TIME_UTC);
     lru_map.emplace(ts, 3);
 
 
@@ -118,12 +125,16 @@ int main(void)
     timespec_get(&ts, TIME_UTC);
     lru_map.emplace(ts, 5);
 
+
     timespec_get(&ts, TIME_UTC);
     lru_map.emplace(ts, 6);
 
-
     timespec_get(&ts, TIME_UTC);
     lru_map.emplace(ts, 7);
+
+
+    timespec_get(&ts, TIME_UTC);
+    lru_map.emplace(ts, 8);
     //
     // test map ordering when inserting immediately in order
     //
@@ -180,10 +191,16 @@ int main(void)
     void * nullTest = nullptr;
     test1.lru_put(1, nullTest); // insert null test on clear.
 
+    //
+    // add another function lru_replace() to fix this case.
+    //
+    // will insert if key does not exist, replace value if
+    // key does exist.
+    //
     void * notNullTest = strdup( "This will be a memory leak" );
     test1.lru_put(1, notNullTest); // test error message
 
-    void * fred = strdup("fred is somewhat awesome");
+    void * fred = strdup("this challenge is pretty fun.  and challenging really");
     test1.lru_put(2, fred);
 
     void * dogs = strdup("my dogs are insane");
@@ -192,7 +209,35 @@ int main(void)
     void * kids = strdup("my kids are amazing");
     test1.lru_put(4, kids);
 
+    void * wife = strdup("my wife is pretty.  and pretty hot.  and super smart.");
+    test1.lru_put(5, wife);
+
     test1.lru_clear();
+
+    //
+    // strings are on the stack, 
+    // so cleanup function doesnt do anything,
+    // but still has to be set for lru_cache constructor.
+    //
+    lru_cache stack_strings_cache(3, cleanup_stack_string);
+
+    char stack_str1[]  = "Test stack string #1";
+    stack_strings_cache.lru_put(1, stack_str1 );
+
+    char stack_str2[]  = "Test stack string #2";
+    stack_strings_cache.lru_put(2, stack_str2 );
+
+    char stack_str3[]  = "Test stack string #3";
+    stack_strings_cache.lru_put(3, stack_str3 );
+
+    char stack_str4[]  = "Test stack string #4";
+    stack_strings_cache.lru_put(4, stack_str4 );
+
+    char stack_str5[]  = "Test stack string #5";
+    stack_strings_cache.lru_put(5, stack_str5 );
+
+    stack_strings_cache.lru_clear();
+
 
 }
 

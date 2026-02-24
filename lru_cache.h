@@ -86,13 +86,21 @@ class lru_cache
         lru_cache( const lru_cache & ) = delete;
         lru_cache & operator= ( const lru_cache & ) = delete;
 
+        void update_key_in_map( const int key );
+        int remove_oldest_timestamp_entry( void );
+
+
 
         //
         // map to store nanosecond insert/update timestamps
         // and the key that was last accessed/updated at time x.
         //
-        std::map<struct timespec, int, TimeSpecCmp> lru_map_;
+        std::map<struct timespec, int, TimeSpecCmp> lru_timestamp_map_;
 
+        //
+        // fast access to my timestamp map by key
+        //
+        std::unordered_map<int, struct timespec> lru_key_map_;
 
         //
         // actual cache is stored in a hash map
@@ -113,6 +121,10 @@ class lru_cache
         //
         const std::function< void (void*) > cleanup_memory_;
 };
+
+typedef std::unordered_map<int, struct timespec>::const_iterator key_map_citer;
+typedef std::map<struct timespec, int, TimeSpecCmp>::const_iterator timestamp_map_citer;
+
 
 
 

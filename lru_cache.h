@@ -2,12 +2,24 @@
 #define LRU_CACHE_H__
 
 #include <unordered_map>
+#include <functional>
+#include <stdexcept>
 
 class lru_cache
 {
     public:
-        lru_cache( void ) : max_size_(0) {}
-        lru_cache( const size_t max_entries ) : max_size_(max_entries) {}
+        lru_cache( 
+                const size_t max_entries,
+                const std::function< void (void*) >cleanup_func ) :
+            max_size_(max_entries), 
+            cleanup_memory_(cleanup_func) 
+        {
+            if( !cleanup_func )
+            {
+                throw std::invalid_argument(
+                        "Cleanup Memory Function Cannot be NULL!");
+            }
+        }
     
         void lru_init( const size_t max_entries );
         void* lru_get( const int key );
@@ -23,8 +35,20 @@ class lru_cache
 
 
     private:
+        //
+        // do not allow empty:
+        // empty constructor
+        // copy constructor
+        // assignment operator.
+        //
+        lru_cache( void ) = delete;
+        lru_cache( const lru_cache & ) = delete;
+        lru_cache & operator= ( const lru_cache & ) = delete;
+
         std::unordered_map<int, void*> cache_;
-        size_t max_size_;
+
+        const size_t max_size_;
+        const std::function< void (void*) > cleanup_memory_;
 };
 
 

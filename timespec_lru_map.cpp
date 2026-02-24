@@ -48,6 +48,11 @@ fpotm@LAPTOP-EA8OT4CH MINGW64 /c/dev
 #endif
 
 
+void cleanup_allocated_string( void* str )
+{
+    free(str);
+    str = nullptr;
+}
 
 struct TimeSpecCmp
 {
@@ -164,7 +169,7 @@ int main(void)
     //
     // ok, test the preliminary lru_cache functions 
     //
-    lru_cache test1(5);
+    lru_cache test1(5, cleanup_allocated_string);
     void * str1 = strdup("test1");
     test1.lru_put(1, str1);
 

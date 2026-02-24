@@ -59,6 +59,8 @@ when inserting into the cache, check max size
 ----------------------------------------------------------------------
 #endif
 
+#include <iostream>
+
 #include "lru_cache.h"
 
 
@@ -72,9 +74,14 @@ when inserting into the cache, check max size
 // copy constructor should also be invalidated
 // only constructor with size should be allowed.
 //
-void lru_cache::lru_init( const size_t max_entries )
+void lru_cache::lru_init( const size_t max_entries ) 
 {
-    max_size_ = max_entries;
+    std::cout << "Cannot set LRU Cache size to " << max_entries 
+        << "\nThe lru_cache lru_init function has been disabled.\n" 
+        << "Please initialize the maximum cache entry size in the constructor"
+        << std::endl;
+
+    // max_size_ = max_entries;
 }
 
 void* lru_cache::lru_get( const int key )

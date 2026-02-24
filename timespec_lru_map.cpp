@@ -1,9 +1,12 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
+#include <cstring>
 #include <iostream>
 #include <map>
- 
+
+#include "lru_cache.h"
+
 //
 // print_entry function requires -std=c++20
 // because of the auto& to map entry.
@@ -89,7 +92,6 @@ int main(void)
     printf("Raw timespec.tv_nsec: %09ld\n", ts.tv_nsec);
 
 
-
     std::map<struct timespec, int, TimeSpecCmp> lru_map;
 
     timespec_get(&ts, TIME_UTC);
@@ -157,5 +159,22 @@ int main(void)
 
     for (const auto& entry : lru_map)
         print_entry(entry);
+
+
+    //
+    // ok, test the preliminary lru_cache functions 
+    //
+    lru_cache test1(5);
+    void * str1 = strdup("test1");
+    test1.lru_put(1, str1);
+
+    void * str2 = test1.lru_get(1);
+    std::cout << "get(1): " << (char*)str2 << std::endl;
+
+    void * str3 = test1.lru_remove(1);
+    std::cout << "remove(1): " << (char*)str3 << std::endl;
+    free(str3);
+
+
 }
 

@@ -71,7 +71,13 @@ void print_entry(
         << entry.second << '\n';
 }
 
-
+//
+// beginning block for timespec example from
+// example from https://en.cppreference.com/w/c/chrono/timespec
+// 
+// map custom comparator from examples at
+// https://en.cppreference.com/w/cpp/container/map/map.html
+//
 int main(void)
 {
     struct timespec ts;

@@ -53,22 +53,6 @@ void cleanup_allocated_string( void* str )
     free(str);
     str = nullptr;
 }
-
-struct TimeSpecCmp
-{
-    bool operator()(
-            const struct timespec& lhs, 
-            const struct timespec& rhs) const
-    {
-        if( lhs.tv_sec != rhs.tv_sec )
-        {
-            return lhs.tv_sec < rhs.tv_sec;
-        }
-
-        return lhs.tv_nsec < rhs.tv_nsec;
-    }
-};
-
  
 void print_entry(
         const auto& entry)
@@ -178,7 +162,7 @@ int main(void)
 
     void * str3 = test1.lru_remove(1);
     std::cout << "remove(1): " << (char*)str3 << std::endl;
-    free(str3);
+    cleanup_allocated_string(str3);
 
 
 }

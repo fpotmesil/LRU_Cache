@@ -92,6 +92,7 @@ int main(void)
 
     std::map<struct timespec, int, TimeSpecCmp> lru_map;
 
+    timespec_get(&ts, TIME_UTC);
     lru_map.emplace(ts, 1);
 
     timespec_get(&ts, TIME_UTC);
@@ -122,17 +123,39 @@ int main(void)
     //
     // test map ordering when inserting immediately in order
     //
-  for (const auto& entry : lru_map)
+    std::cout << "Map after initial 7 insertions: " << std::endl;
+    for (const auto& entry : lru_map)
         print_entry(entry);
 
-  //
-  // test the map beginning gives me the 'oldest' entry.
-  //
-        auto it = lru_map.begin();
-            std::cout << "First map entry timestamp: " 
-                << it->first.tv_sec << "." 
-                << it->first.tv_nsec << ", key: "
-                << it->second << '\n';
+    //
+    // test the map beginning gives me the 'oldest' entry.
+    //
+    auto iter = lru_map.begin();
+    std::cout << "First map entry timestamp: " 
+        << iter->first.tv_sec << "." 
+        << iter->first.tv_nsec << ", key: "
+        << iter->second << '\n';
 
+    //
+    // should be erasing LRU Cache key 1
+    //
+    lru_map.erase(iter);
+
+    //
+    // re-insert LRU Cache key 1 with updated timestamp
+    //
+    timespec_get(&ts, TIME_UTC);
+    lru_map.emplace(ts, 1);
+
+    //
+    // now check map ordering to make sure key 1 is actually the newest
+    // and not the oldeset
+    //
+    std::cout << "Map after erasing and re-inserting key 1 "
+        "to check ordering by time: " 
+        << std::endl;
+
+    for (const auto& entry : lru_map)
+        print_entry(entry);
 }
 

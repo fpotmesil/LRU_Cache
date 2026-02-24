@@ -50,8 +50,21 @@ fpotm@LAPTOP-EA8OT4CH MINGW64 /c/dev
 
 void cleanup_allocated_string( void* str )
 {
-    free(str);
-    str = nullptr;
+    if( str )
+    {
+        std::cout << __func__ << " called with arg: '" 
+            << (char*)str << "' at address: " << str << std::endl;
+    }
+    else
+    {
+        std::cout << __func__ << " called with null" << std::endl; 
+    }
+
+    if( str )
+    {
+        free(str);
+        str = nullptr;
+    }
 }
  
 void print_entry(
@@ -153,7 +166,7 @@ int main(void)
     //
     // ok, test the preliminary lru_cache functions 
     //
-    lru_cache test1(5, cleanup_allocated_string);
+    lru_cache test1(3, cleanup_allocated_string);
     void * str1 = strdup("test1");
     test1.lru_put(1, str1);
 
@@ -164,6 +177,22 @@ int main(void)
     std::cout << "remove(1): " << (char*)str3 << std::endl;
     cleanup_allocated_string(str3);
 
+    void * nullTest = nullptr;
+    test1.lru_put(1, nullTest); // insert null test on clear.
+
+    void * notNullTest = strdup( "This will be a memory leak" );
+    test1.lru_put(1, notNullTest); // test error message
+
+    void * fred = strdup("fred is somewhat awesome");
+    test1.lru_put(2, fred);
+
+    void * dogs = strdup("my dogs are insane");
+    test1.lru_put(3, dogs);
+
+    void * kids = strdup("my kids are amazing");
+    test1.lru_put(4, kids);
+
+    test1.lru_clear();
 
 }
 

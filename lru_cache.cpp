@@ -99,9 +99,48 @@ void* lru_cache::lru_get( const int key )
     return nullptr;
 }
 
+//
+// FJP FIXME - using insert_or_assign() will give us a 
+// memory leak on replacing value unless stack allocated!
+//
 void lru_cache::lru_put( const int key, void* value )
 {
-    cache_.insert_or_assign(key, value);
+    //
+    // need some more logic for this one.  maybe someday.
+    //
+    // cache_.insert_or_assign(key, value);
+    //
+    const auto[iter, inserted] = cache_.emplace(key, value);
+
+    if( inserted )
+    {
+        std::cout << "cache key# " << key
+            << " storing address " << value << std::endl;
+    }
+    else
+    {
+        std::cout << "cache key# " << key
+            << " storing existing address " << iter->second 
+            << ", lru_put failed." << std::endl;
+    }
+}
+
+
+void lru_cache::lru_clear( void )
+{
+    std::cout << "cache has " << cache_.size() 
+        << " entries.  Clearing entries now." << std::endl;
+
+    for( auto& [key, value]: cache_ )
+    {
+        std::cout << "clearing memory for cache key# " 
+            << key << ", value: " << value << std::endl;
+        
+        cleanup_memory_(value);
+    }
+
+    std::cout << "clearing cache now." << std::endl;
+    cache_.clear();
 }
 
 

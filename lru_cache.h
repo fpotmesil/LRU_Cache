@@ -69,6 +69,12 @@ class lru_cache
         //
         void* lru_remove( const int key );
 
+        //
+        // remove all the entries and call the callback to clear 
+        // any allocated memory
+        //
+        void lru_clear( void );
+
     private:
         //
         // do not allow:

@@ -8,7 +8,10 @@ CLIENT_OBJS := $(addprefix obj/,$(notdir $(CLIENT_SRCS:.cpp=.o)))
 #
 # RHEL does not recognize -std=c++20 and makes me use -fconcepts.
 #
-CXX_FLAGS := -g -std=c++2a -pedantic -Wall -Wextra -Werror -Wunreachable-code -fconcepts
+# after Valgrind/GDB testing remove the -g and replace -O0 with -O3
+# [fred@snapperhead LRU_Cache]$ valgrind --leak-check=full --show-leak-kinds=all ./LruCacheTest 
+#
+CXX_FLAGS := -g -O0 -std=c++2a -pedantic -Wall -Wextra -Werror -Wunreachable-code -fconcepts
 #
 # For RHEL snapperhead, this is the include line to use:
 #

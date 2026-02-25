@@ -228,14 +228,30 @@ void lru_cache::lru_put( const int key, void* value )
             << "  removing oldest timestamp entry..." << std::endl;
         int temp_key = remove_oldest_timestamp_entry();
 
-        std::cout << "have to free memory and remove key " 
-            << temp_key << " from the cache!" << std::endl;
+        if( temp_key < 0 )
+        {
+            std::cout << __func__ << ": ERROR removing oldest timestamp entry!"
+                << std::endl;
+        }
+        else
+        {
+            std::cout << "have to free memory and remove key " 
+                << temp_key << " from the cache!" << std::endl;
 
-        //
-        // FJP TODO:
-        // remove the temp key.
-        // but first get the value and call the deleter to free memory!
-        //
+            auto iter = cache_.find(temp_key);
+
+            if( iter != cache_.end() )
+            {
+                void * rval = iter->second;
+                cleanup_memory_(rval);
+                cache_.erase(iter);
+            }
+            else
+            {
+                std::cout << __func__ << ": ERROR finding key " 
+                    << temp_key << " in cache " << std::endl;
+            }
+        }
     }
     //
     // need some more logic for this one.  maybe someday.

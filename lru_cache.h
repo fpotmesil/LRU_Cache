@@ -75,6 +75,15 @@ class lru_cache
         //
         void lru_clear( void );
 
+        //
+        // for debugging, dump out all the timestamp map entries
+        // to make sure the keys are in order after a bunch of
+        // lru_put and lru_get calls, we would delete in this order
+        // if the map was full and a lru_put call inserted a new
+        // entry in the cache
+        //
+        void dump_timestamp_map( void );
+
     private:
         //
         // do not allow:
@@ -86,8 +95,9 @@ class lru_cache
         lru_cache( const lru_cache & ) = delete;
         lru_cache & operator= ( const lru_cache & ) = delete;
 
-        void update_key_in_map( const int key );
+        void update_timestamp_maps( const int key );
         int remove_oldest_timestamp_entry( void );
+
 
 
 

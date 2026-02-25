@@ -174,6 +174,12 @@ int main(void)
         print_entry(entry);
 
 
+    std::cout << "\n\n\n" 
+        << "-----------------------------------------------------------\n"
+        << "                LRU Cache Tests Begin                      \n" 
+        << "-----------------------------------------------------------\n"
+        << std::endl;
+
     //
     // ok, test the preliminary lru_cache functions 
     //
@@ -209,8 +215,13 @@ int main(void)
     void * kids = strdup("my kids are amazing");
     test1.lru_put(4, kids);
 
-    void * wife = strdup("my wife is pretty.  and pretty hot.  and super smart.");
+    void * wife = strdup("my wife is pretty.  and super smart.");
     test1.lru_put(5, wife);
+
+    void * check = test1.lru_get(3);    // make this the 'newest'
+    std::cout << "Entry 3 cast to string: " << (char*)check << std::endl;
+    test1.dump_timestamp_map();
+
 
     test1.lru_clear();
 

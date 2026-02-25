@@ -25,6 +25,9 @@ void lru_cache::lru_init( const size_t max_entries )
     // max_size_ = max_entries;
 }
 
+//
+// FJP FIXME - update the timestamp maps!
+//
 void* lru_cache::lru_get( const int key )
 {
     if( !cache_.empty() )
@@ -33,6 +36,7 @@ void* lru_cache::lru_get( const int key )
 
         if( iter != cache_.end() )
         {
+            update_timestamp_maps(key);
             return iter->second; 
         }
     }
@@ -99,7 +103,7 @@ int lru_cache::remove_oldest_timestamp_entry( void )
 // remove both entries and update entries in both maps.
 //
 //
-void lru_cache::update_key_in_map( const int key )
+void lru_cache::update_timestamp_maps( const int key )
 {
     std::unordered_map<int, struct timespec>::const_iterator key_map_citer = 
         lru_key_map_.find(key);
@@ -210,7 +214,7 @@ void lru_cache::lru_put( const int key, void* value )
         // It's tricky, it's tricky, tricky, tricky, tricky
         // here we go.
         //
-        update_key_in_map(key);
+        update_timestamp_maps(key);
     }
     else
     {
@@ -241,9 +245,10 @@ void lru_cache::lru_clear( void )
 //
 // FJP TODO:  This needs to be finished, 
 // the timestamp lookup map is invalidated when this function is used.
+//
 // need to remove the key from both the key->timestamp and timestamp->key maps!!
 //
-// another function, remove_key_in_map() needs to be implemented to remove!
+// another function, remove_key_from_map() needs to be implemented to remove!
 //
 void* lru_cache::lru_remove( const int key )
 {
@@ -260,6 +265,25 @@ void* lru_cache::lru_remove( const int key )
     }
 
     return nullptr;
+}
+
+//
+// for debugging, dump out all the timestamp map
+// to make sure the keys are in order after a bunch
+// of lru_put and lru_get calls
+//
+void lru_cache::dump_timestamp_map( void )
+{
+    std::cout << "Dumping timestamp map keys from oldest to newest:" 
+        << std::endl;
+
+    for (const auto& entry : lru_timestamp_map_)
+    {
+        std::cout << '[' 
+            << entry.first.tv_sec <<"."
+            <<entry.first.tv_nsec << "] = " 
+            << entry.second << '\n';
+    }
 }
 
 
